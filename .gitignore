@@ -6,6 +6,7 @@ cmake_install.cmake
 *.so
 Makefile
 
+build
 ./CMakeFiles/*
 ./src/CMakeFiles/*
 ./src/library/CMakeFiles/*

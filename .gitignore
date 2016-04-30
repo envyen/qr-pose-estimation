@@ -1,19 +1,6 @@
-*~
-CMakeFiles
-CMakeCache.txt
-cmake_install.cmake
-*.a
-*.so
-Makefile
-
+lib
+bin
 build
-./CMakeFiles/*
-./src/CMakeFiles/*
-./src/library/CMakeFiles/*
-./src/example/CMakeFiles/*
-
-./lib/libQRCodeStateEstimation.so
-./bin/estimateLocationFromQRCode
 
 
 ### https://raw.github.com/github/gitignore/5778fded8b14e289ffb59f1fdb80960434455475/Global/SublimeText.gitignore
@@ -85,5 +72,4 @@ CMakeScripts
 Makefile
 cmake_install.cmake
 install_manifest.txt
-
 

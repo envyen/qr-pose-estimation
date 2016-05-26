@@ -9,7 +9,7 @@ calibration
 camera calibration
 @param inputCameraCalibrationMatrix: This is a 3x3 matrix that describes the
 camera transform (taking the distortion into account) in opencv format
-@param inputDistortionParameters: a 1x5 matrix which has the distortion
+@param inputDistortionParameters: a 5x1 matrix which has the distortion
 parameters k1, k2, p1, p2, k3
 @param inputShowResultsInWindow: True if you would like the QR results to be
 shown in a window
@@ -24,18 +24,21 @@ QRCodeStateEstimator::QRCodeStateEstimator(
 		bool inputShowResultsInWindow) {
 	// Check inputs
 	if (inputCameraImageWidth <= 0 || inputCameraImageHeight <= 0) {
+		std::cerr << "Camera image dimensions invalid!" << std::endl;
 		throw SOMException(std::string("Camera image dimensions invalid\n"),
 											 INVALID_FUNCTION_INPUT, __FILE__, __LINE__);
 	}
 
 	// Check camera calibration matrix dimensions
 	if (inputCameraCalibrationMatrix.dims != 2) {
+		std::cerr << "Camera calibration matrix is not 3x3!" << std::endl;
 		throw SOMException(std::string("Camera calibration matrix is not 3x3\n"),
 											 INVALID_FUNCTION_INPUT, __FILE__, __LINE__);
 	}
 
 	for (int i = 0; i < inputCameraCalibrationMatrix.dims; i++) {
 		if (inputCameraCalibrationMatrix.size[i] != 3) {
+			std::cerr << "Camera calibration matrix is not 3x3!" << std::endl;
 			throw SOMException(std::string("Camera calibration matrix is not 3x3\n"),
 												 INVALID_FUNCTION_INPUT, __FILE__, __LINE__);
 		}
@@ -43,15 +46,17 @@ QRCodeStateEstimator::QRCodeStateEstimator(
 
 	// Check distortion coefficients size
 	if (inputCameraDistortionParameters.dims != 2) {
+		std::cerr << "Distortion coefficents vector is not 5x1!" << std::endl;
 		throw SOMException(
-				std::string("Distortion coefficents vector is not 1x5\n"),
+				std::string("Distortion coefficents vector is not 5x1\n"),
 				INVALID_FUNCTION_INPUT, __FILE__, __LINE__);
 	}
 
-	if (inputCameraDistortionParameters.size[1] != 5 ||
-			inputCameraDistortionParameters.size[0] != 1) {
+	if (inputCameraDistortionParameters.size[1] != 1 ||
+			inputCameraDistortionParameters.size[0] != 5) {
+		std::cerr << "Distortion coefficents vector is not 5x1!" << std::endl;
 		throw SOMException(
-				std::string("Distortion coefficents vector is not 1x5\n"),
+				std::string("Distortion coefficents vector is not 5x1\n"),
 				INVALID_FUNCTION_INPUT, __FILE__, __LINE__);
 	}
 
@@ -278,7 +283,7 @@ bool QRCodeStateEstimator::estimateOneOrMoreStatesFromGrayscaleFrame(
 		// Use solvePnP to get the rotation and translation vector of the QR code
 		// relative to the camera
 		cv::solvePnP(objectVerticesInObjectCoordinates, openCVPoints, cameraMatrix,
-								 distortionParameters, rotationVector, translationVector);
+								 distortionParameters.t(), rotationVector, translationVector);
 
 		cv::Mat_<double> rotationMatrix, viewMatrix(4, 4);
 

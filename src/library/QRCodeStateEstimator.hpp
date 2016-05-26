@@ -1,6 +1,7 @@
 #ifndef QRCODESTATEESTIMATORHPP
 #define QRCODESTATEESTIMATORHPP
 
+#include <iostream>
 #include <string>
 #include <algorithm>
 #include <map>

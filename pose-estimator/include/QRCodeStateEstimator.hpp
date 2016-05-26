@@ -6,8 +6,6 @@
 #include <algorithm>
 #include <map>
 
-#include <SOMException.hpp>
-#include <SOMScopeGuard.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -73,8 +71,6 @@ class QRCodeStateEstimator {
 	meters
 	@return: true if it was able to scan a QR code and estimate its pose relative
 	to it and false otherwise
-
-	@exceptions: This function can throw exceptions
 	*/
 	bool estimateStateFromBGRFrame(const cv::Mat& inputBGRFrame,
 																 cv::Mat& inputCameraPoseBuffer,
@@ -97,8 +93,6 @@ class QRCodeStateEstimator {
 	meters
 	@return: true if it was able to scan a QR code and estimate its pose relative
 	to it and false otherwise
-
-	@exceptions: This function can throw exceptions
 	*/
 	bool estimateStateFromGrayscaleFrame(const cv::Mat& inputGrayscaleFrame,
 																			 cv::Mat& inputCameraPoseBuffer,
@@ -120,8 +114,6 @@ class QRCodeStateEstimator {
 	meters
 	@return: true if it was able to scan a QR code and estimate its pose relative
 	to it and false otherwise
-
-	@exceptions: This function can throw exceptions
 	*/
 	bool estimateOneOrMoreStatesFromBGRFrame(
 			const cv::Mat& inputBGRFrame,
@@ -144,8 +136,6 @@ class QRCodeStateEstimator {
 	meters
 	@return: true if it was able to scan a QR code and estimate its pose relative
 	to it and false otherwise
-
-	@exceptions: This function can throw exceptions
 	*/
 	bool estimateOneOrMoreStatesFromGrayscaleFrame(
 			const cv::Mat& inputGrayscaleFrame,

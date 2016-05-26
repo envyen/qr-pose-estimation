@@ -43,11 +43,8 @@ int main(int argc, char** argv) {
 
 	// Initialize the state estimator, while wrapping any exceptions so we know
 	// where it came from
-	std::unique_ptr<QRCodeStateEstimator> stateEstimator;
-	SOM_TRY
-	stateEstimator.reset(new QRCodeStateEstimator(640, 480, cameraMatrix,
-																								distortionParameters, true));
-	SOM_CATCH("Error initializing state estimator\n")
+	QRCodeStateEstimator stateEstimator(640, 480, cameraMatrix,
+																								distortionParameters, true);
 
 	// Initialize some variables we are going to use while processing frames
 	cv::Mat frame;
@@ -62,10 +59,8 @@ int main(int argc, char** argv) {
 
 		// Give the frame to the state estimator and try to get the camera's pose
 		// from the QR code image
-		SOM_TRY
-		thereIsANewFrame = stateEstimator->estimateStateFromBGRFrame(
+		thereIsANewFrame = stateEstimator.estimateStateFromBGRFrame(
 				frame, cameraPose, QRCodeIdentifierBuffer, QRCodeDimensionBuffer);
-		SOM_CATCH("Error estimating state\n")
 
 		// Print out values of camera's pose matrix
 		if (thereIsANewFrame) {

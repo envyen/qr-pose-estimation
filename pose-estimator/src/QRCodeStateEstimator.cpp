@@ -13,8 +13,6 @@ camera transform (taking the distortion into account) in opencv format
 parameters k1, k2, p1, p2, k3
 @param inputShowResultsInWindow: True if you would like the QR results to be
 shown in a window
-
-@exception: This function can throw exceptions
 */
 QRCodeStateEstimator::QRCodeStateEstimator(
 		int inputCameraImageWidth,
@@ -25,39 +23,27 @@ QRCodeStateEstimator::QRCodeStateEstimator(
 	// Check inputs
 	if (inputCameraImageWidth <= 0 || inputCameraImageHeight <= 0) {
 		std::cerr << "Camera image dimensions invalid!" << std::endl;
-		throw SOMException(std::string("Camera image dimensions invalid\n"),
-											 INVALID_FUNCTION_INPUT, __FILE__, __LINE__);
 	}
 
 	// Check camera calibration matrix dimensions
 	if (inputCameraCalibrationMatrix.dims != 2) {
 		std::cerr << "Camera calibration matrix is not 3x3!" << std::endl;
-		throw SOMException(std::string("Camera calibration matrix is not 3x3\n"),
-											 INVALID_FUNCTION_INPUT, __FILE__, __LINE__);
 	}
 
 	for (int i = 0; i < inputCameraCalibrationMatrix.dims; i++) {
 		if (inputCameraCalibrationMatrix.size[i] != 3) {
 			std::cerr << "Camera calibration matrix is not 3x3!" << std::endl;
-			throw SOMException(std::string("Camera calibration matrix is not 3x3\n"),
-												 INVALID_FUNCTION_INPUT, __FILE__, __LINE__);
 		}
 	}
 
 	// Check distortion coefficients size
 	if (inputCameraDistortionParameters.dims != 2) {
 		std::cerr << "Distortion coefficents vector is not 5x1!" << std::endl;
-		throw SOMException(
-				std::string("Distortion coefficents vector is not 5x1\n"),
-				INVALID_FUNCTION_INPUT, __FILE__, __LINE__);
 	}
 
 	if (inputCameraDistortionParameters.size[1] != 1 ||
 			inputCameraDistortionParameters.size[0] != 5) {
 		std::cerr << "Distortion coefficents vector is not 5x1!" << std::endl;
-		throw SOMException(
-				std::string("Distortion coefficents vector is not 5x1\n"),
-				INVALID_FUNCTION_INPUT, __FILE__, __LINE__);
 	}
 
 	expectedCameraImageWidth = inputCameraImageWidth;
@@ -92,8 +78,6 @@ after the dimension information has been removed
 meters
 @return: true if it was able to scan a QR code and estimate its pose relative to
 it and false otherwise
-
-@exceptions: This function can throw exceptions
 */
 bool QRCodeStateEstimator::estimateStateFromBGRFrame(
 		const cv::Mat& inputBGRFrame,
@@ -101,19 +85,17 @@ bool QRCodeStateEstimator::estimateStateFromBGRFrame(
 		std::string& inputQRCodeIdentifierBuffer,
 		double& inputQRCodeDimensionBuffer) {
 	if (inputBGRFrame.channels() != 3) {
-		throw SOMException(std::string("Given frame is not BGR\n"),
-											 INVALID_FUNCTION_INPUT, __FILE__, __LINE__);
+		std::cerr << "Given frame is not BGR!" << std::endl;
+		return false;
 	}
 
 	// Convert the frame to grayscale
 	cvtColor(inputBGRFrame, frameBuffer, CV_BGR2GRAY);
 
 	// Get the pose using the grayscale version
-	SOM_TRY
 	return estimateStateFromGrayscaleFrame(frameBuffer, inputCameraPoseBuffer,
 																				 inputQRCodeIdentifierBuffer,
 																				 inputQRCodeDimensionBuffer);
-	SOM_CATCH("Error calculating pose from image\n")
 }
 
 /*
@@ -131,8 +113,6 @@ after the dimension information has been removed
 meters
 @return: true if it was able to scan a QR code and estimate its pose relative to
 it and false otherwise
-
-@exceptions: This function can throw exceptions
 */
 bool QRCodeStateEstimator::estimateStateFromGrayscaleFrame(
 		const cv::Mat& inputGrayscaleFrame,
@@ -171,8 +151,6 @@ QR code after the dimension information has been removed
 meters
 @return: true if it was able to scan a QR code and estimate its pose relative to
 it and false otherwise
-
-@exceptions: This function can throw exceptions
 */
 bool QRCodeStateEstimator::estimateOneOrMoreStatesFromBGRFrame(
 		const cv::Mat& inputBGRFrame,
@@ -180,19 +158,17 @@ bool QRCodeStateEstimator::estimateOneOrMoreStatesFromBGRFrame(
 		std::vector<std::string>& inputQRCodeIdentifiersBuffer,
 		std::vector<double>& inputQRCodeDimensionsBuffer) {
 	if (inputBGRFrame.channels() != 3) {
-		throw SOMException(std::string("Given frame is not BGR\n"),
-											 INVALID_FUNCTION_INPUT, __FILE__, __LINE__);
+		std::cerr << "Given frame is not BGR!" << std::endl;
+		return false;
 	}
 
 	// Convert the frame to grayscale
 	cvtColor(inputBGRFrame, frameBuffer, CV_BGR2GRAY);
 
 	// Get the pose using the grayscale version
-	SOM_TRY
 	return estimateOneOrMoreStatesFromGrayscaleFrame(
 			frameBuffer, inputCameraPosesBuffer, inputQRCodeIdentifiersBuffer,
 			inputQRCodeDimensionsBuffer);
-	SOM_CATCH("Error calculating pose from image\n")
 }
 
 /*
@@ -214,30 +190,29 @@ it and false otherwise
 @exceptions: This function can throw exceptions
 */
 bool QRCodeStateEstimator::estimateOneOrMoreStatesFromGrayscaleFrame(
-		const cv::Mat& inputGrayscaleFrame,
+		const cv::Mat& inputFrame,
 		std::vector<cv::Mat>& inputCameraPosesBuffer,
 		std::vector<std::string>& inputQRCodeIdentifiersBuffer,
 		std::vector<double>& inputQRCodeDimensionsBuffer) {
-	if (inputGrayscaleFrame.channels() != 1) {
-		throw SOMException(std::string("Given frame is not grayscale\n"),
-											 INVALID_FUNCTION_INPUT, __FILE__, __LINE__);
+	if (inputFrame.channels() != 1) {
+		std::cerr << "Given frame is not grayscale!" << std::endl;
+		return false;
 	}
 
 	// Wrap the image data so that it can be used by zbar
-	int frameWidth = inputGrayscaleFrame.cols;
-	int frameHeight = inputGrayscaleFrame.rows;
-	uchar* rawData = (uchar*)(inputGrayscaleFrame.data);
+	int frameWidth = inputFrame.cols;
+	int frameHeight = inputFrame.rows;
+	uchar* rawData = (uchar*)(inputFrame.data);
 
 	// Wrap image data
 	zbar::Image zbarFrame(frameWidth, frameHeight, "Y800", rawData,
 												frameWidth * frameHeight);
-	SOMScopeGuard zbarFrameGuard([&]() { zbarFrame.set_data(NULL, 0); });
 
 	// Scan for QR codes
 	if (zbarScanner.scan(zbarFrame) == -1) {
-		printf("TestScanner error\n");
-		throw SOMException(std::string("QR code scanner returned with error\n"),
-											 ZBAR_ERROR, __FILE__, __LINE__);
+		std::cerr << "QR code scanner returned with error!" << std::endl;
+		zbarFrame.set_data(NULL, 0);
+		return false;
 	}
 
 	// Clear the buffers to store everything in
@@ -316,7 +291,7 @@ bool QRCodeStateEstimator::estimateOneOrMoreStatesFromGrayscaleFrame(
 
 	if (showResultsInWindow) {
 		// Draw base image
-		cv::Mat bufferFrame = inputGrayscaleFrame;
+		cv::Mat bufferFrame = inputFrame;
 
 		// Draw location of the symbols found
 		for (zbar::Image::SymbolIterator symbol = zbarFrame.symbol_begin();
@@ -360,6 +335,7 @@ bool QRCodeStateEstimator::estimateOneOrMoreStatesFromGrayscaleFrame(
 	// Make sure it updates every frame, even if it found the qr code in the last
 	// frame
 	zbarScanner.recycle_image(zbarFrame);
+	zbarFrame.set_data(NULL, 0);
 
 	if (inputCameraPosesBuffer.size() > 0) {
 		return true;

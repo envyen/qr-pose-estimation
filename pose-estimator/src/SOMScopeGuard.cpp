@@ -1,4 +1,4 @@
-#include "SOMScopeGuard.hpp"
+#include <SOMScopeGuard.hpp>
 
 /*
 This function constructs the scope guard and sets the function for it to call

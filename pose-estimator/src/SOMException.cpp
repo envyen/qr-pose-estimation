@@ -1,4 +1,4 @@
-#include "SOMException.hpp"
+#include <SOMException.hpp>
 
 /*
 This function initializes the exception object with the required information.

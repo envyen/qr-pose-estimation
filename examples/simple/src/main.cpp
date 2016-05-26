@@ -2,7 +2,7 @@
 #include <iomanip>
 #include <memory>
 
-#include "../library/QRCodeStateEstimator.hpp"
+#include <QRCodeStateEstimator.hpp>
 #include <cmath>
 
 void printUsage(std::string const& name) {

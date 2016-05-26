@@ -9,4 +9,12 @@
 	{
 		"tab_size": 2
 	},
+	"build_systems":
+	[
+		{
+			"name": "build qrcodestateestimation",
+			"working_dir": "${project_path}",
+			"cmd":  ["./build.sh"]
+		},
+	]
 }
